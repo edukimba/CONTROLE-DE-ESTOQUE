@@ -7,7 +7,7 @@ app_routes = Blueprint('app_routes', __name__)
 
 #1.CADASTRAR NOVO PRODUTO:
 
-@app_routes.route('/novo_produto', methods=['POST'])
+@app_routes.route('/cadastrar_produto', methods=['POST'])
 def novo_produto():
     dados = request.get_json()
     try:
@@ -64,7 +64,7 @@ def listar_produtos():
 
 #3.BUSCAR PRODUTO POR NOME:
 
-@app_routes.route('/buscar_produto/<int:id>', methods=['GET'])
+@app_routes.route('/buscar_por_nome', methods=['GET'])
 def buscar_produto():
     try:
         termo = request.args.get('nome', '').strip()
@@ -95,7 +95,53 @@ def buscar_produto():
 
 #4.LISTAR PRODUTOS COM BAIXO ESTOQUE:
 
-@app_routes.route('/baixo_estoque', methods=['GET'])   
+@app_routes.route('/baixo_estoque', methods=['GET'])
+def listar_baixo_estoque():
+    try:
+        limite = request.args.get('limite', default=5, type=int)
+        produtos = Produtos.query.filter(Produtos.quantidade <= limite).all()
+
+        if not produtos:
+            return jsonify({"ERRO": "NENHUM PRODUTO COM ESTOQUE MENOR OU IGUAL A {limite} ENCONTRADO!"}), 200
+        
+        resultado = []
+        for p in produtos:
+            resultado.append({
+                "id": p.id,
+                "nome": p.nome,
+                "descricao": p.descricao,
+                "quantidade": p.quantidade,
+                "preco": p.preco
+            })
+
+        return jsonify({
+            "mensagem": f"PRODUTOS COM ESTOQUE MENOR OU IGUAL A {limite}:",
+            "produtos": resultado
+        }), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+
+#5.VER UM PRODUTO ESPECÍFICO:
+
+@app_routes.route('/buscar_por_id<int:id>', methods=['GET'])
+def buscar_produto_especifico(id):
+    try:
+        produto = Produtos.query.get(id)
+
+        if not produto:
+            return jsonify({"ERRO": "PRODUTO NÃO ENCONTRADO!"}), 404
+        
+        return jsonify({
+            "id": produto.id,
+            "nome": produto.nome,
+            "descricao": produto.descricao,
+            "quantidade": produto.quantidade,
+            "preco": produto.preco
+        }), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
 
 #ATUALIZAR PRODUTO:
 
