@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
-from database import db
+from ..database import db
 from models import Movimentacoes, Produtos
+from datetime import datetime
 
 app_routes = Blueprint('app_routes', __name__)
 
-#CRIAR NOVA MOVIMENTAÇÃO:
+#1.CRIAR NOVA MOVIMENTAÇÃO:
 
 @app_routes.route('/nova_movimentacao', methods=['POST'])
 def nova_movimentacao():
@@ -18,7 +19,7 @@ def nova_movimentacao():
         if not produto:
             return jsonify({"erro": "Produto não encontrado!"}), 404
         
-#ATUALIZAR O ESTOQUE:
+#2.ATUALIZAR ESTOQUE:
 
         if tipo == 'entrada':
             produto.quantidade += quantidade
@@ -49,20 +50,121 @@ def nova_movimentacao():
     except Exception as e:
         db.session.rollback()
         return jsonify({"erro": f"Ocorreu um erro interno: {str(e)}"}), 500
+    
+#3.LISTAR TODAS MOVIMENTAÇÕES:
 
+@app_routes.route('/todas_movimentacoes', methods=['GET'])
+def todas_movimentacoes():
+    try:
+        movimentacao = Movimentacoes.query.all()
+        resultado = []
+        for t in movimentacao:
+            resultado.append({
+                "id": t.id,
+                "nome": t.nome,
+                "descricao": t.descricao,
+                "quantidade": t.quantidade,
+                "preco": t.preco
+            })
 
-#LISTAR ENTRADAS E SAÍDAS DE PRODUTOS:
+        return jsonify(resultado), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+    
+#4.LISTAR ENTRADAS E SAÍDAS DE PRODUTOS:
 
-@app_routes.route('/movimentacoes', methods=['GET'])
+@app_routes.route('/controle_produtos', methods=['GET'])
 def controle_de_produtos():
-    tipo = request.args.get('tipo') 
+    try:
+        tipo = request.args.get('tipo') 
+        if tipo in ["entrada", "saida"]:
 
-    if tipo in ["entrada", "saida"]:
-        produtos_filtrados = Produtos.query.all()
+            produtos_filtrados = Produtos.query.all()
+            
+            resultado = [
+                {"id": t.id, "tipo": t.tipo, "nome": t.nome, "preco": t.preco, "quantidade": t.quantidade, "descricao": t.descricao}
+                for t in produtos_filtrados
+                ]
+            return jsonify(resultado), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO{str(e)}"}), 500
+    
+#5.VER MOVIMENTAÇÃO ESPECÍFICA:
 
-    resultado = [
-        {"id": t.id, "tipo": t.tipo, "nome": t.nome, "preco": t.preco, "quantidade": t.quantidade, "descricao": t.descricao}
-        for t in produtos_filtrados
-    ]
+@app_routes.route('/buscar_mov_id<int:id>', methods=['GET'])
+def buscar_movimentacao_especifica(id):
+    try:
+        movimentacao = Movimentacoes.query.get(id)
 
-    return jsonify(resultado), 200
+        if not movimentacao:
+            return jsonify({"ERRO": "MOVIMENTAÇÃO NÃO ENCONTRADA!"}), 404
+        
+        return jsonify({
+            "id": movimentacao.id,
+            "nome": movimentacao.nome,
+            "descricao": movimentacao.descricao,
+            "quantidade": movimentacao.quantidade,
+            "preco": movimentacao.preco
+        }), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+
+#6.REMOVER MOVIMENTAÇÃO:
+
+@app_routes.route('remover_movimentcao/<int:id>', methods=['DELETE'])
+def remover_movimentacao(id):
+    try:
+        movimentacoes = Movimentacoes.query.get(id)
+        if not movimentacoes:
+            return jsonify({"ERRO": "MOVIMENTAÇÃO NÃO ENCONTRADA!"}), 404
+        
+        db.session.delete(movimentacoes)
+        db.session.commit()
+
+        return jsonify({"mensagem": "MOVIMENTAÇÃO REMOVIDA COM SUCESSO!"}), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+    
+#7.MOVIMENTAÇÕES POR UMA DETERMINADA DATA:
+
+@app_routes.route('/mov_por_data', methods=['GET'])
+def movi_por_data():
+    try:
+        data_str = request.args.get('data')
+
+        if not data_str:
+            return jsonify({"ERRO": "ENVIE O PARÂMETRO 'data' NO FORMATO YYYY-MM-DD!"}), 400
+        
+        try:
+            data = datetime.strptime(data_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"ERRO": "FORMATO DE DATA INVÁLIDO,USE O FORMATO YYYY-MM-DD!"}), 400
+        
+        movimentacoes = Movimentacoes.query.filter(
+            db.func.date(movimentacoes.data) == data
+        ).all()
+
+        if not movimentacoes:
+            return jsonify({"mensagem": f"NENHUMA MOVIMENTAÇÃO ENCONTRADA PARA {data_str}!"}), 200
+        
+        resultado = []
+        for m in movimentacoes:
+            resultado.append({
+                "id": m.id,
+                "produto_id": m.produto_id,
+                "tipo": m.tipo,
+                "quantidade": m.quantidade,
+                "data": m.data.strtime("%Y-%m-%d %H:%M:%S")
+            })
+
+        return jsonify({
+            "mensagem": f"MOVIMENTAÇÕES DO DIA {data_str}:",
+            "movimentacoes": resultado            
+        }), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500

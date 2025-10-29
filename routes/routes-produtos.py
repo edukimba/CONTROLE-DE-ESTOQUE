@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from database import db
-from models import Produtos
+from ..database import db
+from ..models import Produtos
 from sqlalchemy import and_
 
 app_routes = Blueprint('app_routes', __name__)
@@ -122,7 +122,7 @@ def listar_baixo_estoque():
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
 
-#5.VER UM PRODUTO ESPECÍFICO:
+#5.VER PRODUTO ESPECÍFICO:
 
 @app_routes.route('/buscar_por_id<int:id>', methods=['GET'])
 def buscar_produto_especifico(id):
@@ -143,7 +143,7 @@ def buscar_produto_especifico(id):
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
 
-#ATUALIZAR PRODUTO:
+#6.ATUALIZAR PRODUTO:
 
 @app_routes.route('/atualizar_produto/<int:id>', methods=['PUT'])
 def atualizar_produto(id):
@@ -162,9 +162,9 @@ def atualizar_produto(id):
 
     return jsonify({"mensagem": "PRODUTO ATUALIZADO COM SUCESSO!"}), 201
 
-#REMOVER PRODUTO:
+#7.REMOVER PRODUTO:
 
-@app_routes.route('remover_produto/<int:id>', methods=['DELETE'])
+@app_routes.route('/remover_produto/<int:id>', methods=['DELETE'])
 def remover_produto(id):
     try:
         produtos = Produtos.query.get(id)
@@ -178,4 +178,38 @@ def remover_produto(id):
     
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
-    
+
+#8.RELATORIO GERAL DO ESTOQUE:
+
+@app_routes.route('/relatorio_geral', methods=['GET'])
+def relatorio_geral():
+    try:
+        produtos = Produtos.query.all()
+
+        if not produtos:
+            return jsonify({"mensagem": "NENHUM PRODUTO ENCONTRADO NO ESTOQUE!"}), 404
+        
+        relatorio = []
+        valor_total_estoque = 0
+
+        for p in produtos:
+            valor_produto = p.quantidade * p.preco
+            valor_total_estoque += valor_produto
+
+            relatorio.append({
+                "id": p.id,
+                "nome": p.nome,
+                "descricao": p.descricao,
+                "quantidade": p.quantidade,
+                "preco_unitario": p.preco,
+                "valor_total_produto": valor_produto
+            })
+
+            return jsonify({
+                "total_produtos": len(produtos),
+                "valor_total_estoque": valor_total_estoque,
+                "produtos": relatorio
+            }), 200
+        
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
