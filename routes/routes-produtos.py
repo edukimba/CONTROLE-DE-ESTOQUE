@@ -184,10 +184,17 @@ def remover_produto(id):
 @app_routes.route('/relatorio_geral', methods=['GET'])
 def relatorio_geral():
     try:
-        produtos = Produtos.query.all()
+        baixo_estoque = request.args.get('baixo estoque')
+
+        LIMITE_ESTOQUE = 5
+
+        if baixo_estoque and baixo_estoque.lower() == 'true':
+            produtos = Produtos.query.filter(Produtos.quantidade <= LIMITE_ESTOQUE).all()
+        else:
+            produtos = Produtos.query.all()
 
         if not produtos:
-            return jsonify({"mensagem": "NENHUM PRODUTO ENCONTRADO NO ESTOQUE!"}), 404
+            return jsonify({"ERRO": "NENHUM PRODUTO ENCONTRADO COM OS DADOS INFORMADOS!"}), 404
         
         relatorio = []
         valor_total_estoque = 0
@@ -199,7 +206,7 @@ def relatorio_geral():
             relatorio.append({
                 "id": p.id,
                 "nome": p.nome,
-                "descricao": p.descricao,
+                "descricao": p.descrisao,
                 "quantidade": p.quantidade,
                 "preco_unitario": p.preco,
                 "valor_total_produto": valor_produto
@@ -212,4 +219,4 @@ def relatorio_geral():
             }), 200
         
     except Exception as e:
-        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO{str(e)}"}), 500

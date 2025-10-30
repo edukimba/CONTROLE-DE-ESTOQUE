@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from ..database import db
 from models import Movimentacoes, Produtos
 from datetime import datetime
+from sqlalchemy import func
 
 app_routes = Blueprint('app_routes', __name__)
 
@@ -168,3 +169,41 @@ def movi_por_data():
     
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+    
+#8.PRODUTOS COM MAIS MOVIMENTAÇÕES:
+
+@app_routes.route('/mais_movimentacoes', methods = ['GET'])
+def relatorio_mais_mov():
+    try:
+        
+        resultados = (
+            db.session.query(
+                Produtos.id,
+                Produtos.nome,
+                func.count(Movimentacoes.id).label('total_movimentacoes')
+            )
+            .join(Movimentacoes, Produtos.id == Movimentacoes.produto_id)
+            .group_by(Produtos.id)
+            .order_by(func.count(Movimentacoes.id).desc())
+            .all()
+        )
+
+        if not resultados:
+            return jsonify({"mensagem": "Nenhuma movimentação registrada."}), 404
+
+        relatorio = []
+        for r in resultados:
+            relatorio.append({
+                "id_produto": r.id,
+                "nome": r.nome,
+                "total_movimentacoes": r.total_movimentacoes
+            })
+
+        return jsonify({
+            "total_produtos_com_movimentacoes": len(relatorio),
+            "produtos": relatorio
+        }), 200
+
+    except Exception as e:
+        return jsonify({"erro": f"Ocorreu um erro interno: {str(e)}"}), 500
+
