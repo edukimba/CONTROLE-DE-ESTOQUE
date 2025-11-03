@@ -1,14 +1,16 @@
 from flask import Blueprint, request, jsonify
-from ..database import db
+from database import db
 from models import Movimentacoes, Produtos
 from datetime import datetime
 from sqlalchemy import func
+from auth.auth import token_required
 
-app_routes = Blueprint('app_routes', __name__)
+app_routes = Blueprint('movimentacoes', __name__)
 
 #1.CRIAR NOVA MOVIMENTAÇÃO:
 
 @app_routes.route('/nova_movimentacao', methods=['POST'])
+@token_required(admin_only=True)
 def nova_movimentacao():
     dados = request.get_json()
     try:
@@ -55,6 +57,7 @@ def nova_movimentacao():
 #3.LISTAR TODAS MOVIMENTAÇÕES:
 
 @app_routes.route('/todas_movimentacoes', methods=['GET'])
+@token_required(admin_only=True)
 def todas_movimentacoes():
     try:
         movimentacao = Movimentacoes.query.all()
@@ -76,6 +79,7 @@ def todas_movimentacoes():
 #4.LISTAR ENTRADAS E SAÍDAS DE PRODUTOS:
 
 @app_routes.route('/controle_produtos', methods=['GET'])
+@token_required(admin_only=True)
 def controle_de_produtos():
     try:
         tipo = request.args.get('tipo') 
@@ -95,6 +99,7 @@ def controle_de_produtos():
 #5.VER MOVIMENTAÇÃO ESPECÍFICA:
 
 @app_routes.route('/buscar_mov_id<int:id>', methods=['GET'])
+@token_required(admin_only=True)
 def buscar_movimentacao_especifica(id):
     try:
         movimentacao = Movimentacoes.query.get(id)
@@ -116,6 +121,7 @@ def buscar_movimentacao_especifica(id):
 #6.REMOVER MOVIMENTAÇÃO:
 
 @app_routes.route('remover_movimentcao/<int:id>', methods=['DELETE'])
+@token_required(admin_only=True)
 def remover_movimentacao(id):
     try:
         movimentacoes = Movimentacoes.query.get(id)
@@ -133,6 +139,7 @@ def remover_movimentacao(id):
 #7.MOVIMENTAÇÕES POR UMA DETERMINADA DATA:
 
 @app_routes.route('/mov_por_data', methods=['GET'])
+@token_required(admin_only=True)
 def movi_por_data():
     try:
         data_str = request.args.get('data')
@@ -173,6 +180,7 @@ def movi_por_data():
 #8.PRODUTOS COM MAIS MOVIMENTAÇÕES:
 
 @app_routes.route('/mais_movimentacoes', methods = ['GET'])
+@token_required(admin_only=True)
 def relatorio_mais_mov():
     try:
         

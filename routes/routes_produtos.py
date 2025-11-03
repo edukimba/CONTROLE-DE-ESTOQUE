@@ -1,13 +1,15 @@
 from flask import Blueprint, request, jsonify
-from ..database import db
-from ..models import Produtos
+from database import db
+from models import Produtos
 from sqlalchemy import and_
+from auth.auth import token_required
 
-app_routes = Blueprint('app_routes', __name__)
+app_routes = Blueprint('produtos', __name__)
 
 #1.CADASTRAR NOVO PRODUTO:
 
 @app_routes.route('/cadastrar_produto', methods=['POST'])
+@token_required(admin_only=True)
 def novo_produto():
     dados = request.get_json()
     try:
@@ -44,6 +46,7 @@ def novo_produto():
 #2.LISTAR TODOS OS PRODUTOS:
 
 @app_routes.route('/listar_produtos', methods=['GET'])
+@token_required()
 def listar_produtos():
     try:
         produtos = Produtos.query.all()
@@ -65,6 +68,7 @@ def listar_produtos():
 #3.BUSCAR PRODUTO POR NOME:
 
 @app_routes.route('/buscar_por_nome', methods=['GET'])
+@token_required()
 def buscar_produto():
     try:
         termo = request.args.get('nome', '').strip()
@@ -96,6 +100,7 @@ def buscar_produto():
 #4.LISTAR PRODUTOS COM BAIXO ESTOQUE:
 
 @app_routes.route('/baixo_estoque', methods=['GET'])
+@token_required()
 def listar_baixo_estoque():
     try:
         limite = request.args.get('limite', default=5, type=int)
@@ -125,6 +130,7 @@ def listar_baixo_estoque():
 #5.VER PRODUTO ESPECÍFICO:
 
 @app_routes.route('/buscar_por_id<int:id>', methods=['GET'])
+@token_required()
 def buscar_produto_especifico(id):
     try:
         produto = Produtos.query.get(id)
@@ -146,6 +152,7 @@ def buscar_produto_especifico(id):
 #6.ATUALIZAR PRODUTO:
 
 @app_routes.route('/atualizar_produto/<int:id>', methods=['PUT'])
+@token_required(admin_only=True)
 def atualizar_produto(id):
     produtos = Produtos.query.get(id)
     if not produtos:
@@ -165,6 +172,7 @@ def atualizar_produto(id):
 #7.REMOVER PRODUTO:
 
 @app_routes.route('/remover_produto/<int:id>', methods=['DELETE'])
+@token_required(admin_only=True)
 def remover_produto(id):
     try:
         produtos = Produtos.query.get(id)
@@ -182,6 +190,7 @@ def remover_produto(id):
 #8.RELATORIO GERAL DO ESTOQUE:
 
 @app_routes.route('/relatorio_geral', methods=['GET'])
+@token_required(admin_only=True)
 def relatorio_geral():
     try:
         baixo_estoque = request.args.get('baixo estoque')
