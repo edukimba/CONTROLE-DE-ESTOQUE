@@ -11,31 +11,36 @@ app_routes = Blueprint('movimentacoes', __name__)
 
 @app_routes.route('/nova_movimentacao', methods=['POST'])
 @token_required(admin_only=True)
-def nova_movimentacao():
+def nova_movimentacao(usuario):
     dados = request.get_json()
+    
     try:
         tipo = dados.get('tipo')
-        quantidade = float(dados.get('quantidade'))
+        quantidade = float(dados.get('quantidade', 0))
         produto_id = dados.get('produto_id')
+
+        
+        if not tipo or not quantidade or not produto_id:
+            return jsonify({"erro": "Campos 'tipo', 'quantidade' e 'produto_id' são obrigatórios!"}), 400
 
         produto = Produtos.query.get(produto_id)
         if not produto:
             return jsonify({"erro": "Produto não encontrado!"}), 404
         
-#2.ATUALIZAR ESTOQUE:
-
+        
         if tipo == 'entrada':
             produto.quantidade += quantidade
         elif tipo == 'saida':
             if produto.quantidade < quantidade:
-                return jsonify({"erro": "Estoque insulficiente para saída!"}), 400
+                return jsonify({"erro": "Estoque insuficiente para saída!"}), 400
             produto.quantidade -= quantidade
         else:
-            return jsonify({"erro": "Tipo de movimentação inválida,use 'entrada' ou 'saida'."})
+            return jsonify({"erro": "Tipo de movimentação inválido. Use 'entrada' ou 'saida'."}), 400
+        
         
         nova_movimentacao = Movimentacoes(
             tipo=tipo,
-            quantidae=quantidade,
+            quantidade=quantidade,
             produto_id=produto_id
         )
 
@@ -44,7 +49,7 @@ def nova_movimentacao():
 
         return jsonify({
             "mensagem": "Movimentação registrada com sucesso!",
-            "produto":{
+            "produto": {
                 "nome": produto.nome,
                 "quantidade_atual": produto.quantidade
             }
@@ -53,94 +58,134 @@ def nova_movimentacao():
     except Exception as e:
         db.session.rollback()
         return jsonify({"erro": f"Ocorreu um erro interno: {str(e)}"}), 500
-    
+
 #3.LISTAR TODAS MOVIMENTAÇÕES:
 
 @app_routes.route('/todas_movimentacoes', methods=['GET'])
 @token_required(admin_only=True)
-def todas_movimentacoes():
+def todas_movimentacoes(usuario):
     try:
-        movimentacao = Movimentacoes.query.all()
+        movimentacoes = Movimentacoes.query.all()
+
+        if not movimentacoes:
+            return jsonify({"mensagem": "Nenhuma movimentação registrada ainda."}), 200
+
         resultado = []
-        for t in movimentacao:
+        for m in movimentacoes:
+            produto = Produtos.query.get(m.produto_id)  
+
             resultado.append({
-                "id": t.id,
-                "nome": t.nome,
-                "descricao": t.descricao,
-                "quantidade": t.quantidade,
-                "preco": t.preco
+                "id_movimentacao": m.id,
+                "tipo": m.tipo,
+                "quantidade": m.quantidade,
+                "data": m.data.strftime("%d/%m/%Y %H:%M:%S") if hasattr(m, 'data') and m.data else None,
+                "produto": {
+                    "id": produto.id if produto else None,
+                    "nome": produto.nome if produto else "Produto excluído",
+                    "descricao": produto.descricao if produto else None,
+                    "preco": produto.preco if produto else None
+                }
             })
 
-        return jsonify(resultado), 200
+        return jsonify({"movimentacoes": resultado}), 200
     
     except Exception as e:
-        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+        return jsonify({"ERRO": f"Ocorreu um erro interno: {str(e)}"}), 500
     
 #4.LISTAR ENTRADAS E SAÍDAS DE PRODUTOS:
 
 @app_routes.route('/controle_produtos', methods=['GET'])
 @token_required(admin_only=True)
-def controle_de_produtos():
+def controle_de_produtos(usuario):
     try:
-        tipo = request.args.get('tipo') 
-        if tipo in ["entrada", "saida"]:
+        tipo = request.args.get('tipo', '').lower().strip()
 
-            produtos_filtrados = Produtos.query.all()
-            
-            resultado = [
-                {"id": t.id, "tipo": t.tipo, "nome": t.nome, "preco": t.preco, "quantidade": t.quantidade, "descricao": t.descricao}
-                for t in produtos_filtrados
-                ]
-            return jsonify(resultado), 200
-    
+        if tipo in ["entrada", "saida"]:
+            movimentacoes = Movimentacoes.query.filter_by(tipo=tipo).all()
+        else:
+            movimentacoes = Movimentacoes.query.all()
+
+        if not movimentacoes:
+            return jsonify({"mensagem": "Nenhuma movimentação encontrada com os filtros aplicados."}), 200
+
+        resultado = []
+        for m in movimentacoes:
+            produto = Produtos.query.get(m.produto_id)
+
+            resultado.append({
+                "id_movimentacao": m.id,
+                "tipo": m.tipo,
+                "quantidade": m.quantidade,
+                "data": m.data.strftime("%d/%m/%Y %H:%M:%S") if hasattr(m, 'data') and m.data else None,
+                "produto": {
+                    "id": produto.id if produto else None,
+                    "nome": produto.nome if produto else "Produto excluído",
+                    "descricao": produto.descricao if produto else None,
+                    "preco": produto.preco if produto else None,
+                    "quantidade_atual": produto.quantidade if produto else None
+                }
+            })
+
+        return jsonify({"controle_produtos": resultado}), 200
+
     except Exception as e:
-        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO{str(e)}"}), 500
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+
     
 #5.VER MOVIMENTAÇÃO ESPECÍFICA:
 
-@app_routes.route('/buscar_mov_id<int:id>', methods=['GET'])
+@app_routes.route('/buscar_mov_id/<int:id>', methods=['GET'])
 @token_required(admin_only=True)
-def buscar_movimentacao_especifica(id):
+def buscar_movimentacao_especifica(usuario, id):
     try:
         movimentacao = Movimentacoes.query.get(id)
 
         if not movimentacao:
             return jsonify({"ERRO": "MOVIMENTAÇÃO NÃO ENCONTRADA!"}), 404
-        
+
+        produto = Produtos.query.get(movimentacao.produto_id)
+
         return jsonify({
-            "id": movimentacao.id,
-            "nome": movimentacao.nome,
-            "descricao": movimentacao.descricao,
+            "id_movimentacao": movimentacao.id,
+            "tipo": movimentacao.tipo,
             "quantidade": movimentacao.quantidade,
-            "preco": movimentacao.preco
+            "data": movimentacao.data.strftime("%d/%m/%Y %H:%M:%S") if hasattr(movimentacao, 'data') and movimentacao.data else None,
+            "produto": {
+                "id": produto.id if produto else None,
+                "nome": produto.nome if produto else "Produto excluído",
+                "descricao": produto.descricao if produto else None,
+                "preco": produto.preco if produto else None,
+                "quantidade_atual": produto.quantidade if produto else None
+            }
         }), 200
-    
+
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
 
 #6.REMOVER MOVIMENTAÇÃO:
 
-@app_routes.route('remover_movimentcao/<int:id>', methods=['DELETE'])
+@app_routes.route('/remover_movimentacao/<int:id>', methods=['DELETE'])
 @token_required(admin_only=True)
-def remover_movimentacao(id):
+def remover_movimentacao(usuario, id):
     try:
-        movimentacoes = Movimentacoes.query.get(id)
-        if not movimentacoes:
+        movimentacao = Movimentacoes.query.get(id)
+        if not movimentacao:
             return jsonify({"ERRO": "MOVIMENTAÇÃO NÃO ENCONTRADA!"}), 404
         
-        db.session.delete(movimentacoes)
+        db.session.delete(movimentacao)
         db.session.commit()
 
         return jsonify({"mensagem": "MOVIMENTAÇÃO REMOVIDA COM SUCESSO!"}), 200
     
     except Exception as e:
+        db.session.rollback()
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
     
 #7.MOVIMENTAÇÕES POR UMA DETERMINADA DATA:
 
 @app_routes.route('/mov_por_data', methods=['GET'])
 @token_required(admin_only=True)
-def movi_por_data():
+def movi_por_data(usuario):
     try:
         data_str = request.args.get('data')
 
@@ -150,10 +195,10 @@ def movi_por_data():
         try:
             data = datetime.strptime(data_str, '%Y-%m-%d').date()
         except ValueError:
-            return jsonify({"ERRO": "FORMATO DE DATA INVÁLIDO,USE O FORMATO YYYY-MM-DD!"}), 400
+            return jsonify({"ERRO": "FORMATO DE DATA INVÁLIDO! USE YYYY-MM-DD."}), 400
         
         movimentacoes = Movimentacoes.query.filter(
-            db.func.date(movimentacoes.data) == data
+            db.func.date(Movimentacoes.data) == data
         ).all()
 
         if not movimentacoes:
@@ -166,7 +211,7 @@ def movi_por_data():
                 "produto_id": m.produto_id,
                 "tipo": m.tipo,
                 "quantidade": m.quantidade,
-                "data": m.data.strtime("%Y-%m-%d %H:%M:%S")
+                "data": m.data.strftime("%Y-%m-%d %H:%M:%S")
             })
 
         return jsonify({
@@ -179,11 +224,10 @@ def movi_por_data():
     
 #8.PRODUTOS COM MAIS MOVIMENTAÇÕES:
 
-@app_routes.route('/mais_movimentacoes', methods = ['GET'])
+@app_routes.route('/relatorio_mais_movimentacoes', methods=['GET'])
 @token_required(admin_only=True)
-def relatorio_mais_mov():
+def relatorio_mais_mov(usuario):
     try:
-        
         resultados = (
             db.session.query(
                 Produtos.id,
