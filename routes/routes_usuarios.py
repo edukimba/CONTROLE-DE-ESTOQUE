@@ -4,7 +4,7 @@ from database import db
 from models import Usuario
 from auth.auth import token_required, gerar_token
 
-app_routes = Blueprint("usuarios_routes", __name__)
+app_routes = Blueprint('usuarios_routes', __name__)
 
 #1.REGISTRO DE USUÁRIOS:
 
@@ -70,23 +70,31 @@ def atualizar_usuario(usuario_logado, id):
         return jsonify({"ERRO": "VOCÊ NÃO TEM PERMISSÃO PARA ALTERAR ESTE USUÁRIO!"}), 403
     
     dados = request.get_json()
+
     nome = dados.get("nome")
-    email = email.get("email")
-    senha = senha.get("senha")
+    email = dados.get("email")
+    senha = dados.get("senha")
 
     if nome:
         usuario.nome = nome
+
     if email:
-            usuario_existente = usuario.query.filter(Usuario.email == email, Usuario.id !=id).firts()
-            if usuario_existente:
-                return jsonify({"ERRO": "E-MAIL JÁ ESTÁ EM USO!"}), 400
-            usuario.email = email
+        usuario_existente = Usuario.query.filter(
+            Usuario.email == email,
+            Usuario.id != id
+        ).first()
+
+        if usuario_existente:
+            return jsonify({"ERRO": "E-MAIL JÁ ESTÁ EM USO!"}), 400
+        
+        usuario.email = email
 
     if senha:
         usuario.senha = generate_password_hash(senha)
     
     db.session.commit()
     return jsonify({"mensagem": "USUÁRIO ATUALIZADO COM SUCESSO!"}), 200
+
 
 #4.CADASTRAR ADMIN:
 @app_routes.route('/cadastro_admin', methods=['POST'])
@@ -125,7 +133,7 @@ def cadastro_admin(usuario):
 
 @app_routes.route('/remover_usuario/<int:id>', methods=['DELETE'])
 @token_required(admin_only=True)
-def remover_usuario(id):
+def remover_usuario(usuario, id):
     try:
         usuario = Usuario.query.get(id)
         if not usuario:
