@@ -26,13 +26,15 @@ def registro():
     if usuario_existente:
         return jsonify({"ERRO": "E-MAIL JÁ JÁ CADASTRADO!"}), 400
     
-    novo_usuario = Usuario(
+    novo = Usuario(
         nome=nome,
         email=email,
-        senha=generate_password_hash(senha),
         admin=False
     )
-    db.session.add(novo_usuario)
+
+    novo.set_senha(dados['senha'])
+
+    db.session.add(novo)
     db.session.commit()
 
     return jsonify({"mensagem": "USUÁRIO REGISTRADO COM SUCESSO!"}), 201
@@ -47,7 +49,8 @@ def login():
     senha = data.get('senha')
 
     usuario = Usuario.query.filter_by(email=email).first()
-    if not usuario or not check_password_hash(usuario.senha, senha):
+
+    if not usuario or not usuario.checar_senha(senha):
         return jsonify({"ERRO": "USUÁRIO E SENHA INVÁLIDOS!"}), 401
     
     token = gerar_token(usuario)
@@ -56,6 +59,7 @@ def login():
 #3.ATUALIZAR USUÁRIO:
 
 @app_routes.route('/atualizar_usuario/<int:id>', methods=['POST'])
+@token_required(admin_only=True)
 def atualizar_usuario(usuario_logado, id):
     usuario = Usuario.query.get(id)
 
@@ -87,7 +91,7 @@ def atualizar_usuario(usuario_logado, id):
 #4.CADASTRAR ADMIN:
 @app_routes.route('/cadastro_admin', methods=['POST'])
 @token_required(admin_only=True)
-def cadastro_admin():
+def cadastro_admin(usuario):
     dados = request.get_json()
 
     if not dados:
@@ -107,9 +111,10 @@ def cadastro_admin():
     novo_admin = Usuario(
         nome=nome,
         email=email,
-        senha=generate_password_hash(senha),
         admin=True
     )
+
+    novo_admin.set_senha(senha)
 
     db.session.add(novo_admin)
     db.session.commit()
@@ -130,6 +135,31 @@ def remover_usuario(id):
         db.session.commit()
 
         return jsonify({"mensagem": "USUÁRIO REMOVIDO COM SUCESSO!"}), 200
+    
+    except Exception as e:
+        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
+
+#6.LISTAR USUARIOS:
+
+@app_routes.route('/listar_usuarios', methods=['GET'])
+@token_required(admin_only=True)
+def listar_usuarios(usuario):
+    try:
+        usuarios = Usuario.query.all()
+
+        resultado = []
+        for u in usuarios:
+            resultado.append({
+                "id": u.id,
+                "nome": u.nome,
+                "email": u.email,
+                "admin": u.admin
+            })
+        
+        return jsonify({
+            "total_usuarios": len(resultado),
+            "usuarios": resultado
+        }), 200
     
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
