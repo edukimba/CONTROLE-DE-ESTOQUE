@@ -7,6 +7,7 @@ class Produtos(db.Model):
     __tablename__ = "produtos"
 
     id = db.Column(db.Integer, primary_key=True)
+    tipo = db.Column(db.String(50), nullable=True)
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.String(200))
     quantidade = db.Column(db.Integer, nullable=False, default=0)
