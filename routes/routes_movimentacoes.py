@@ -59,7 +59,7 @@ def nova_movimentacao(usuario):
         db.session.rollback()
         return jsonify({"erro": f"Ocorreu um erro interno: {str(e)}"}), 500
 
-#3.LISTAR TODAS MOVIMENTAÇÕES:
+#2.LISTAR TODAS MOVIMENTAÇÕES:
 
 @app_routes.route('/todas_movimentacoes', methods=['GET'])
 @token_required(admin_only=True)
@@ -91,48 +91,8 @@ def todas_movimentacoes(usuario):
     
     except Exception as e:
         return jsonify({"ERRO": f"Ocorreu um erro interno: {str(e)}"}), 500
-    
-#4.LISTAR ENTRADAS E SAÍDAS DE PRODUTOS:
-
-@app_routes.route('/controle_produtos', methods=['GET'])
-@token_required(admin_only=True)
-def controle_de_produtos(usuario):
-    try:
-        tipo = request.args.get('tipo', '').lower().strip()
-
-        if tipo in ["entrada", "saida"]:
-            movimentacoes = Movimentacoes.query.filter_by(tipo=tipo).all()
-        else:
-            movimentacoes = Movimentacoes.query.all()
-
-        if not movimentacoes:
-            return jsonify({"mensagem": "Nenhuma movimentação encontrada com os filtros aplicados."}), 200
-
-        resultado = []
-        for m in movimentacoes:
-            produto = Produtos.query.get(m.produto_id)
-
-            resultado.append({
-                "id_movimentacao": m.id,
-                "tipo": m.tipo,
-                "quantidade": m.quantidade,
-                "data": m.data.strftime("%d/%m/%Y %H:%M:%S") if hasattr(m, 'data') and m.data else None,
-                "produto": {
-                    "id": produto.id if produto else None,
-                    "nome": produto.nome if produto else "Produto excluído",
-                    "descricao": produto.descricao if produto else None,
-                    "preco": produto.preco if produto else None,
-                    "quantidade_atual": produto.quantidade if produto else None
-                }
-            })
-
-        return jsonify({"controle_produtos": resultado}), 200
-
-    except Exception as e:
-        return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
-
-    
-#5.VER MOVIMENTAÇÃO ESPECÍFICA:
+       
+#3.VER MOVIMENTAÇÃO ESPECÍFICA:
 
 @app_routes.route('/buscar_mov_id/<int:id>', methods=['GET'])
 @token_required(admin_only=True)
@@ -162,7 +122,7 @@ def buscar_movimentacao_especifica(usuario, id):
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
 
-#6.REMOVER MOVIMENTAÇÃO:
+#4.REMOVER MOVIMENTAÇÃO:
 
 @app_routes.route('/remover_movimentacao/<int:id>', methods=['DELETE'])
 @token_required(admin_only=True)
@@ -181,7 +141,7 @@ def remover_movimentacao(usuario, id):
         db.session.rollback()
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
     
-#7.MOVIMENTAÇÕES POR UMA DETERMINADA DATA:
+#5.MOVIMENTAÇÕES POR UMA DETERMINADA DATA:
 
 @app_routes.route('/mov_por_data', methods=['GET'])
 @token_required(admin_only=True)
@@ -222,7 +182,7 @@ def movi_por_data(usuario):
     except Exception as e:
         return jsonify({"ERRO": f"OCORREU UM ERRO INTERNO: {str(e)}"}), 500
     
-#8.PRODUTOS COM MAIS MOVIMENTAÇÕES:
+#6.PRODUTOS COM MAIS MOVIMENTAÇÕES:
 
 @app_routes.route('/relatorio_mais_movimentacoes', methods=['GET'])
 @token_required(admin_only=True)

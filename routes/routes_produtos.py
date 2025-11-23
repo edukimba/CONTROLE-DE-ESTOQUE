@@ -56,6 +56,7 @@ def listar_produtos(usuario):
             resultado.append({
                 "tipo": t.tipo,
                 "id": t.id,
+                "nome": t.nome,
                 "descricao": t.descricao,
                 "preco": t.preco,
                 "quantidade": t.quantidade
@@ -70,14 +71,14 @@ def listar_produtos(usuario):
 
 @app_routes.route('/buscar_por_nome', methods=['GET'])
 @token_required()
-def buscar_produto():
+def buscar_produto(usuario):
     try:
         termo = request.args.get('nome', '').strip()
         if not termo:
             return jsonify({"ERRO": "ENVIE UM 'nome' PARA REALIZAR A BUSCA!"}), 400
         
         palavras = termo.split()
-        filtros = [produtos.nome.ilike(f"%{p}") for p in palavras]
+        filtros = [Produtos.nome.ilike(f"%{p}%") for p in palavras]
         produtos = Produtos.query.filter(and_(*filtros)).all()
 
         if not produtos:
@@ -233,7 +234,7 @@ def remover_produto(usuario, id):
 
 @app_routes.route('/relatorio_geral', methods=['GET'])
 @token_required(admin_only=True)
-def relatorio_geral():
+def relatorio_geral(usuario):
     try:
         baixo_estoque = request.args.get('baixo_estoque')
 
