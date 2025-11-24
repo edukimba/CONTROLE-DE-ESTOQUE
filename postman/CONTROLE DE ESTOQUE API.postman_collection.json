@@ -1,0 +1,840 @@
+{
+	"info": {
+		"_postman_id": "68b6e3d5-aeb2-4f08-8878-249561602fb1",
+		"name": "CONTROLE DE ESTOQUE API",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49244984",
+		"_collection_link": "https://edukimba-1883578.postman.co/workspace/edukimba's-Workspace~fe359f2e-d6e7-4723-8dc3-7b7e9fcc57f5/collection/49244984-68b6e3d5-aeb2-4f08-8878-249561602fb1?action=share&source=collection_link&creator=49244984"
+	},
+	"item": [
+		{
+			"name": "AUTENTICAÇÃO",
+			"item": [
+				{
+					"name": "2 - Login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2MzM0MzYxM30.jpgcN_Hqt3s-h3Yh-7WaujGa1FBmiCnmEx0Bn2jSMyY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"\",\r\n    \"senha\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiYWRtaW4iOmZhbHNlLCJleHAiOjE3NjMyODI4NTl9.HrsrkA_z2g8eS_CItrGLV-2asHPrnnVXJjg1S_Gthlk",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "USUÁRIOS",
+			"item": [
+				{
+					"name": "1 - Registro de usuários",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"\",\r\n    \"email\": \"\",\r\n    \"senha\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/registro_usuarios",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"registro_usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3 - Atualizar usuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2MzU3Nzk1NX0.T1Ll1soif1-Dnv9UuUhrDEpHytm6RKa4TJGETUNMxno",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"antonely\",\r\n    \"email\": \"antonely.costa29@gmail.com\", \r\n    \"senha\": \"costa13sil\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/atualizar_usuario/10",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"atualizar_usuario",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4 - Cadastrar admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2MzM0MzYxM30.jpgcN_Hqt3s-h3Yh-7WaujGa1FBmiCnmEx0Bn2jSMyY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"\" , \r\n    \"email\": \"\",\r\n    \"senha\": \"\",\r\n    \"admin\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/cadastro_admin",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"cadastro_admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5 - Remover usuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2MzU3NzA2MH0.uM3IKJ_wav9oqoDhwBuetYwaJcACc3H7oH41eYo8BH0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/remover_usuario/7",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"remover_usuario",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6 - Listar usuários",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2MzM0MzYxM30.jpgcN_Hqt3s-h3Yh-7WaujGa1FBmiCnmEx0Bn2jSMyY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/usuarios/listar_usuarios",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"usuarios",
+								"listar_usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PRODUTOS",
+			"item": [
+				{
+					"name": "1 - Cadastrar produto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4NjY0MX0.IdBRFuLpTUG0oFSWB9ID01A_tGnwy7ilb1eU_mPd1f4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\": \"entrada\",\r\n    \"nome\": \"tesoura bic\",\r\n    \"descricao\": \"pequena e sem ponta\",\r\n    \"preco\": 13.59,\r\n    \"quantidade\": 45\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/cadastrar_produto",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"cadastrar_produto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2 - Listar produtos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4NzEwMH0.GNraOmGwMF8A55I4gBSmGZp4d2AADahA6_9uEoP23uQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/listar_produtos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"listar_produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3 - Buscar por nome",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4ODA4MX0.J4WOrssL6hkl8QXNVIIz4pckEK5MVFbHwf23aGaFljQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/buscar_por_nome?nome=tesoura bic",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"buscar_por_nome"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "tesoura bic"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4 - Listar baixo estoque",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4ODA4MX0.J4WOrssL6hkl8QXNVIIz4pckEK5MVFbHwf23aGaFljQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/baixo_estoque",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"baixo_estoque"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5 - Ver produto específico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4ODA4MX0.J4WOrssL6hkl8QXNVIIz4pckEK5MVFbHwf23aGaFljQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/buscar_por_id/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"buscar_por_id",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6 - Atualizar roduto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4ODA4MX0.J4WOrssL6hkl8QXNVIIz4pckEK5MVFbHwf23aGaFljQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"2\",\r\n    \"nome\": \"rodo\",\r\n    \"descricao\": \"cabo longo e tamanho da boracha pequena\",\r\n    \"quantidade\": 33,\r\n    \"preco\": 29.45\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/atualizar_produto/2",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"atualizar_produto",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7 - Remover produto",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "8 - Relatório geral de estoque",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4OTA4OH0.fZg8V7hNxZiRPLav6Ax-Kzk0pJmW_IWoVVjO8XNBgyQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/produtos/relatorio_geral",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"produtos",
+								"relatorio_geral"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MOVIMENTAÇÕES",
+			"item": [
+				{
+					"name": "1 - Nova movimentação",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzc4OTA4OH0.fZg8V7hNxZiRPLav6Ax-Kzk0pJmW_IWoVVjO8XNBgyQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\": \"saida\",\r\n    \"quantidade\": 3 ,\r\n    \"produto_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/nova_movimentacao",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"nova_movimentacao"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2 - Listar todas movimentações",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzg2ODQzNn0.MUKNPAjdXE1TEIwgo59h-rAn6yoEUxgN4p1dea6MO5Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/todas_movimentacoes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"todas_movimentacoes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3 - Ver movimentação específica",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzg2ODcwMn0.4X2WbWr7w6H3t0R1-4oAbgYZD9yc4WKMbQsl-6xbYxQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/buscar_mov_id/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"buscar_mov_id",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4 - Remover movimentação",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzg2ODcwMn0.4X2WbWr7w6H3t0R1-4oAbgYZD9yc4WKMbQsl-6xbYxQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/remover_movimentacao/2",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"remover_movimentacao",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5 - Movimentação por data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzg2ODcwMn0.4X2WbWr7w6H3t0R1-4oAbgYZD9yc4WKMbQsl-6xbYxQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/mov_por_data?data=2025-11-22",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"mov_por_data"
+							],
+							"query": [
+								{
+									"key": "data",
+									"value": "2025-11-22"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6 - Produtos com mais movimentações",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImV4cCI6MTc2Mzg2ODcwMn0.4X2WbWr7w6H3t0R1-4oAbgYZD9yc4WKMbQsl-6xbYxQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/movimentacoes/relatorio_mais_movimentacoes",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"movimentacoes",
+								"relatorio_mais_movimentacoes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
